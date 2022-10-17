@@ -12,13 +12,13 @@ function AddCard() {
     const [card, setCard] = useState(initialForm); //will change state of card
     const history = useHistory();
     const {deckId} = useParams;
-    const [deck, setDeck] = useState({})
+    const [deck, setDeck] = useState([])
 
     //effect to load deck
     useEffect(() => {
         const abortController = new AbortController()
         async function loadDeck() {
-            const response = await fetch(readDeck, abortController)
+            const response = await fetch(readDeck, abortController.signal)
      
             setDeck(response)
         }
@@ -42,7 +42,7 @@ function AddCard() {
 
      return (
         //form
-        <>
+        <div>
         <nav aria-label='breadcrumb'>
             <ol className='breadcrumb'>
                 <li className='breadcrumb-item'>
@@ -83,7 +83,7 @@ function AddCard() {
               </div>
             </form>
          </div>
-        </>
+        </div>
      )
 }
 

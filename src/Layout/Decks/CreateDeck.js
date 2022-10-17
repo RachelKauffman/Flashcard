@@ -31,7 +31,7 @@ function CreateDeck() {
 
     //form
     return(
-        <>
+        <div>
         <nav aria-label='breadcrumb'>
             <ol className='breadcrumb'>
                 <li className='breadcrumb-item'>
@@ -71,7 +71,7 @@ function CreateDeck() {
               </div>
              </form>
         </div>
-        </>
+        </div>
     )
        
     

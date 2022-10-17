@@ -1,5 +1,5 @@
-import React from "react";
-import {Link, Route,  Switch} from "react-router-dom"
+import {React, useEffect, useState} from "react";
+import {Route,  Switch} from "react-router-dom"
 import Header from "./Header";
 import NotFound from "./NotFound";
 import Study from "./Study";
@@ -9,20 +9,32 @@ import EditDeck from "./Decks/EditDeck"
 import AddCard from "./Cards/AddCard";
 import EditCard from "./Cards/EditCard";
 import Home from "./Home";
+import { listDecks } from "../utils/api/index";
+
 
 function Layout() {
+
+  const [decks, setDecks] = useState([]);
+
+  //get decks
+  useEffect(() => {
+    const abortController = new AbortController()
+    async function loadDecks() {
+      const response = await listDecks (abortController.signal)
+      setDecks(response)
+    }
+    loadDecks()
+    return () => abortController.abort()
+  },[])
+
+
   return (
-    <>
+    <div>
       <Header />
       <div className="container">
         <Switch>
           <Route exact path="/">
-            <Link to="/decks/new">
-            <button class="btn btn-secondary">
-             <i class="fa fa-plus"></i> Create Deck
-            </button>
-            </Link>
-            <Home />
+            <Home decks={decks}/>
           </Route>
 
           <Route exact path="/decks/:deckId/study">
@@ -56,7 +68,7 @@ function Layout() {
 
      
       </div>
-    </>
+    </div>
   );
 }
 

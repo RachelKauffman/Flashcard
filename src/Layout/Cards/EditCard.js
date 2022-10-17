@@ -4,8 +4,7 @@ import {readCard, readDeck, updateCard} from "../../utils/api";
 
 
 function EditCard(){
-    const {cardId} = useParams();
-    const {deckId} = useParams()
+    const {cardId, deckId} = useParams();
     const history = useHistory();
     const initialState = {
         id: "",
@@ -33,7 +32,7 @@ function EditCard(){
      useEffect(() => {
         const abortController = new AbortController();
         async function loadCards() {
-            const response = await readCard (cardId.abortController.signal)
+            const response = await readCard (cardId, abortController.signal)
             setCard(response)
         }
         loadCards();
@@ -63,7 +62,7 @@ function EditCard(){
      })
 
      return(
-        <>
+        <div>
          <nav aria-label='breadcrumb'>
             <ol className='breadcrumb'>
                 <li className='breadcrumb-item'>
@@ -106,16 +105,16 @@ function EditCard(){
                 </div>
                 <div>
                     <Link to={`/decks/${deckId}`}>
-                    <button class="btn btn-secondary" onClick={() => history.push(`{/decks/${deckId}}`)}>
+                    <button class="btn btn-secondary" onClick={() => history.push(`/decks/${deckId}`)}>
                         Cancel</button>
-                    <button class="btn btn-primary" onClick={() => history.push(`{/decks/${deckId}}`)}>
+                    <button class="btn btn-primary" onClick={() => history.push(`/decks/${deckId}`)}>
                         Submit
                     </button>
                     </Link>
                 </div>
             </form>
          </div>
-        </>
+        </div>
      )
 }
 

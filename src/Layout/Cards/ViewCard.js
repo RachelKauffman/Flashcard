@@ -15,7 +15,7 @@ const deleteHandler = async (cardId) => {
     }
 }
 const listCards = cards.map((card) => (
-    <>
+    <div>
     <div className="card">
         <div className="card-body">
             <div>{card.front}</div>
@@ -32,7 +32,7 @@ const listCards = cards.map((card) => (
             <i class="fa fa-trash"></i>
         </button>
     </div>
-</>
+</div>
 ))
 return(
     {listCards}

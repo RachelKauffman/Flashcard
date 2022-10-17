@@ -79,7 +79,7 @@ const nav = (
 
  if (studyDeck.cards.length <= 2) {
         return(
-        <>
+        <div>
         <div>
             {nav}
         </div>
@@ -96,11 +96,11 @@ const nav = (
             </Link>
           </div>
         </div>
-        </>
+        </div>
         )
     } else {
         return(
-            <>
+            <div>
             <div>
                 {nav}
             </div>
@@ -115,7 +115,7 @@ const nav = (
            <button className="btn btn-secondary" onClick={handleFlip}>Flip</button>
            <button className="btn btn-primary" onClick={handleNext}>Next</button>
            </div>
-         </>
+         </div>
         )
     }
 }
