@@ -1,32 +1,14 @@
-import {React, useState, useEffect} from "react";
-import {Link, useParams} from "react-router-dom";
-import {deleteDeck, listDecks} from "../../utils/api"
+import {React} from "react";
+import {Link} from "react-router-dom";
 
-function ListDecks() {
 
-const [deck, setDeck] = useState([]);
-const{deckId} = useParams();
+function ListDecks({decks, deleteHandler}) {
 
-//gets data from listDecks
-useEffect(() => {
-const abortController = new AbortController();
-async function loadDecks() {
-    const response = await listDecks (deckId, abortController.signal)
-    setDeck(response)
-}
-loadDecks();
-return () => abortController.abort()
-},[deckId])
 
-const deleteHandler = async (deckId) => {
-   const prompt = window.confirm("Delete this deck? You will not be able to recover it.")
-   if(prompt) {
-    await deleteDeck(deckId)
-   }
-}
     return (
         <div>
-     {deck.map((deck) => (
+     {decks.map((deck) => (
+        <div key={deck.id}>
       <div className="card">
         <div className="card-body">
             <h4 className="card-title">{deck.name}</h4>
@@ -45,6 +27,7 @@ const deleteHandler = async (deckId) => {
             <button className="btn btn-danger" onClick={deleteHandler}>
                 <i className="fa fa-trash"></i> </button>
         </div>
+       </div>
        </div>
     ))}
     </div>

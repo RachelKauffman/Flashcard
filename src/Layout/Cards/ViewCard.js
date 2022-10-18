@@ -1,42 +1,47 @@
-import {React} from "react"
-import {Link, useHistory, useParams } from "react-router-dom"
-import {deleteCard} from "../../utils/api" 
+import { React } from "react";
+import { Link, useHistory, useParams } from "react-router-dom";
+import { deleteCard } from "../../utils/api";
 
-function ViewCard({cards}) {
-const history = useHistory();
-const {deckId, cardId} = useParams();
+function ViewCard({ deck }) {
+  const history = useHistory();
+  const { deckId, cardId } = useParams();
 
-//delete card
-const deleteHandler = async (cardId) => {
-    const prompt = window.confirm("Delete this card? You will not be able to recover it")
-    if (prompt){
-        await deleteCard(cardId)
-        history.push("/")
+  //delete card
+  const deleteHandler = async () => {
+    const prompt = window.confirm(
+      "Delete this card? You will not be able to recover it"
+    );
+    if (prompt) {
+      await deleteCard(cardId);
+      history.push("/");
     }
-}
-const listCards = cards.map((card) => (
-    <div>
-    <div className="card">
+  };
+  const listCards = deck.cards.map((card, index) => (
+    <>
+      <div key={index} className="card">
         <div className="card-body">
-            <div>{card.front}</div>
-            <div>{card.back}</div>
-        </div>
-    </div>
-<div>
-        <Link to={`/decks/${deckId}/cards/${cardId}/edit`}>
-            <button className="btn btn-secondary">
-                <i class="fa fa-pencil-square-o"></i>Edit
-            </button>
+          <div>{card.front}</div>
+          <div>{card.back}</div>
+      <div>
+        <Link to={`/decks/${deckId}/cards/${card.id}/edit`}>
+          <button className="btn btn-secondary">
+            <i className="fa fa-pencil-square-o"></i>Edit
+          </button>
         </Link>
-        <button className="btn btn-danger" onClick={deleteHandler}>
-            <i class="fa fa-trash"></i>
+        <button className="btn btn-danger" onClick={() => deleteHandler(card.id)}>
+          <i className="fa fa-trash"></i>Delete Card
         </button>
+      </div>
+      </div>
+      </div>
+    </>
+  ));
+  return (
+    <div>
+    <h2 className="texxt-center">Cards</h2>
+    { listCards };
     </div>
-</div>
-))
-return(
-    {listCards}
-)
+  )
 }
 
-export default ViewCard
+export default ViewCard;
