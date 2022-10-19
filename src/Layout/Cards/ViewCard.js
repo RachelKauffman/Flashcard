@@ -1,47 +1,30 @@
 import { React } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
-import { deleteCard } from "../../utils/api";
+import { Link } from "react-router-dom";
 
-function ViewCard({ deck }) {
-  const history = useHistory();
-  const { deckId, cardId } = useParams();
+function ViewCard({ cards = [], handleDelete, deck }) {
 
-  //delete card
-  const deleteHandler = async () => {
-    const prompt = window.confirm(
-      "Delete this card? You will not be able to recover it"
-    );
-    if (prompt) {
-      await deleteCard(cardId);
-      history.push("/");
-    }
-  };
-  const listCards = deck.cards.map((card, index) => (
-    <>
-      <div key={index} className="card">
+  return(
+  cards.map((card) => (
+    <div className="card">
+    <h2 className=" card-title text-center">Cards</h2>
         <div className="card-body">
-          <div>{card.front}</div>
-          <div>{card.back}</div>
+          <div className="row d-flec justify-content-between">
+          <div className="col-5">{card.front}</div>
+          <div className="col-5">{card.back}</div>
       <div>
-        <Link to={`/decks/${deckId}/cards/${card.id}/edit`}>
-          <button className="btn btn-secondary">
-            <i className="fa fa-pencil-square-o"></i>Edit
-          </button>
+        <Link to={`/decks/${deck.id}/cards/${card.id}/edit`} className="btn btn-secondary">
+            <i className="fa fa-pen"></i>Edit
         </Link>
-        <button className="btn btn-danger" onClick={() => deleteHandler(card.id)}>
+        <button className="btn btn-danger" onClick={() => handleDelete(card.id)}>
           <i className="fa fa-trash"></i>Delete Card
         </button>
       </div>
       </div>
       </div>
-    </>
-  ));
-  return (
-    <div>
-    <h2 className="texxt-center">Cards</h2>
-    { listCards };
-    </div>
-  )
+      </div>
+    
+  )))
+
 }
 
 export default ViewCard;

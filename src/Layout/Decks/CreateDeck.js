@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { createDeck } from "../../utils/api";
 
 function CreateDeck() {
@@ -9,7 +9,6 @@ function CreateDeck() {
   };
   const [formData, setFormData] = useState(initialForm);
   const history = useHistory();
-  const { deckId } = useParams;
 
   //updates form when changed
   const changeHandler = ({ target }) => {
@@ -21,7 +20,7 @@ function CreateDeck() {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    const newDeck = await createDeck(formData); //calls data from api
+     await createDeck(formData); //calls data from api
     setFormData({ ...initialForm }); //clears form
     history.push("/");
   };
@@ -41,35 +40,39 @@ function CreateDeck() {
       </nav>
       <div>
         <form onSubmit={submitHandler}>
-          <h1>Create Deck</h1>
-          <div>
+          <h1 className="my-4">Create Deck</h1>
+          <div className="form-group">
             <label htmlFor="name">Name</label>
+           
             <input
               type="text"
               name="name"
               id="name"
+              className='form-control form-control-md'
               placeholder="Deck Name"
               onChange={changeHandler}
               value={formData.name}
             />
           </div>
-          <div>
+          <div className="form-group">
             <label htmlFor="description">Description</label>
             <textarea
               type="textarea"
               name="description"
               id="description"
+              className="form-control"
+              rows="5"
               placeholder="Breif description of the deck"
               onChange={changeHandler}
               value={formData.description}
             />
           </div>
-          <div>
-            <button type="submit" onClick={() => history.push("/")}>
+          <Link to="/" className="mr-2">
+            <button className="btn btn-secondary" onClick={() => history.push("/")}>
               Cancel
             </button>
-            <button type="submit">Submit</button>
-          </div>
+            </Link>
+            <button className="btn btn-primary">Submit</button>
         </form>
       </div>
     </div>

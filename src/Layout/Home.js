@@ -1,9 +1,10 @@
 import { React, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useHistory } from "react-router-dom";
 import ListDecks from "./Decks/ListDecks";
 import { deleteDeck, listDecks } from "../utils/api";
 
 function Home() {
+  const history = useHistory();
   const [decks, setDecks] = useState([]);
   const { deckId } = useParams();
 
@@ -28,6 +29,7 @@ function Home() {
       "Delete this deck? You will not be able to recover it."
     );
     if (prompt) {
+      history.push("/")
       await deleteDeck(deckId);
     }
   };
@@ -36,12 +38,14 @@ function Home() {
     <div key={decks}>
       <div>
         <Link to="/decks/new">
-          <button className="btn btn-secondary">
+          <button className="btn btn-secondary mb-2">
             <i className="fa fa-plus"></i> Create Deck
           </button>
         </Link>
       </div>
-      { <ListDecks key={decks} decks={decks} deleteHandler={deleteHandler} /> }
+      <div>
+      <ListDecks key={decks} decks={decks} deleteHandler={deleteHandler} /> 
+    </div>
     </div>
   );
 }
