@@ -1,10 +1,11 @@
 import { React } from "react";
 import { Link } from "react-router-dom";
 
-function ViewCard({ cards = [], handleDelete, deck }) {
+function ViewCard({ cards, handleDelete, deck }) {
 
-  return(
-  cards.map((card) => (
+return(
+  cards.map((card) => {
+    return(
     <div className="card">
     <h2 className=" card-title text-center">Cards</h2>
         <div className="card-body">
@@ -22,9 +23,8 @@ function ViewCard({ cards = [], handleDelete, deck }) {
       </div>
       </div>
       </div>
-    
-  )))
-
-}
+  )}
+  ))
+    }
 
 export default ViewCard;
