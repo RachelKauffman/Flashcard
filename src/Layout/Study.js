@@ -1,124 +1,152 @@
-import {React, useState, useEffect} from "react"
-import {Link, useHistory, useParams} from "react-router-dom"
-import {readDeck} from "../utils/api"
+import React, { useEffect, useState, useRef } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { readDeck } from '../utils/api';
 
-function Study({cards}){
+function Study() {
+  const mountedRef = useRef(false);
+  const initialState = {
+    deck: { name: 'loading...', cards: [] },
+    isCardFlipped: false,
+    currentIndex: 0,
+  };
 
-const initialState = {
-    flipped: false,
-    currentIndex: 0
-}
-const {deckId} = useParams();
-const [studyDeck, setStudyDeck] = useState(initialState)
-const history = useHistory();
-const {deck, currentIndex} = studyDeck
+  const [studyDeckState, setStudyDeckState] = useState(initialState);
+  const { deck, isCardFlipped, currentIndex } = studyDeckState;
 
-//get deck data
-useEffect(() => {
+  const { deckId } = useParams();
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const abortController = new AbortController();
-    async function loadDecks() {
-        const response = await readDeck (deckId, abortController.signal)
-        setStudyDeck(response)
-    }
-    loadDecks();
-    return () => abortController.abort()
-    },[deckId])
-
-const handleFlip = () => {
-    if(studyDeck.flipped) {
-        setStudyDeck({
-            ...studyDeck,
-            flipped: false
-        })
-    } else {
-        setStudyDeck({
-            ...studyDeck,
-            flipped: true
-        })
-    }
-}
-
-const handleNext = () => {
-    if (studyDeck.currentIndex < cards.length - 1){
-        setStudyDeck({
-            ...studyDeck,
-            currentIndex: studyDeck.currentIndex + 1,
-            flipped: false
-        })
-    } else {
-        const prompt = window.confirm("Restart cards? Click 'cancel' to return to home page")
-        if (prompt) {
-            setStudyDeck(initialState)
-        } else {
-            history.push("/")
+    async function loadDeck() {
+      try {
+        const loadedDeck = await readDeck(deckId, abortController.signal);
+        if (mountedRef.current) {
+          setStudyDeckState((currentState) => ({
+            ...currentState,
+            deck: loadedDeck,
+          }));
         }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          throw error;
+        }
+      }
     }
-}
-     
+    loadDeck();
+    return () => {
+      abortController.abort();
+    };
+  }, [deckId]);
 
+  function flipCardHandler() {
+    setStudyDeckState({
+      ...studyDeckState,
+      isCardFlipped: !studyDeckState['isCardFlipped'],
+    });
+  }
 
-const nav = (
-    <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-            <li className="breadcrumb-item">
-                <Link to="/">
-                    Home
-                </Link>
-            </li>
-            <li className="breadcrumb-item">
-                <Link to={`/decks/${deckId}`}>
-                    {studyDeck.name}
-                </Link>
-            </li>
-            <li classname="breadcrumb-item active" aria-current="page">
-                Study
-            </li>
-        </ol>
+  function getNextCardHandler() {
+    const { cards } = deck;
+    if (currentIndex === cards.length - 1) {
+      const response = window.confirm(
+        'Do you want to restart the deck and study again?'
+      );
+      if (response) {
+        setStudyDeckState((currentState) => ({
+          ...currentState,
+          currentIndex: 0,
+        }));
+      }
+    } else {
+      setStudyDeckState((currentState) => ({
+        ...currentState,
+        currentIndex: currentState.currentIndex++,
+        isCardFlipped: !currentState.isCardFlipped,
+      }));
+    }
+  }
+
+  const breadcrumb = (
+    <nav aria-label='breadcrumb'>
+      <ol className='breadcrumb'>
+        <li className='breadcrumb-item'>
+          <Link to='/'>
+            <i className='fas fa-home'></i> Home
+          </Link>
+        </li>
+        <li className='breadcrumb-item'>
+          <Link to={`/decks/${deckId}`}>{deck.name}</Link>
+        </li>
+        <li className='breadcrumb-item active' aria-current='page'>
+          Study
+        </li>
+      </ol>
     </nav>
-)
+  );
 
- if (studyDeck.cards.length <= 2) {
-        return(
-        <div>
-        <div>
-            {nav}
-        </div>
-        <div className="card">
-          <div className="card-body">
-            <h1>{studyDeck.name}: Study</h1>
-            <h2 className="card-title">Not enough cards.</h2>
-            <p className="card-text">
-                You need at least 3 cards to study. 
+  if (deck.cards.length <= 2) {
+    return (
+      <>
+        {breadcrumb}
+        <div className='card'>
+          <div className='card-body'>
+            <h1>{deck.name}: Study</h1>
+            <h2 className='card-title'>Not enough cards.</h2>
+            <p className='card-text'>
+              You need at least 3 cards to study. Please add more cards to this
+              deck.
             </p>
-            <Link to={`decks/${deckId}/cards/new`}>
-                <button className="btn btn-secondary" onClick={() => history.push(`decks/${deckId}/cards/new`)}>
-                    <i className="fa fa-plus"></i>Add Cards</button>
+            <Link to={`/decks/${deckId}/cards/new`}>
+              <button type='button' className='btn btn-primary'>
+                <i className='fas fa-plus'></i> Add Card
+              </button>
             </Link>
           </div>
         </div>
+      </>
+    );
+  } else {
+    return (
+      <>
+        {breadcrumb}
+        <h1>Study: {deck.name}</h1>
+        <div className='card'>
+          <div className='card-body'>
+            <h4 className='card-title'>
+              Card {currentIndex + 1} of {deck.cards.length}
+            </h4>
+            <h5 className='card-text secondary-text'>
+              {!isCardFlipped
+                ? `${deck.cards[currentIndex].front}`
+                : `${deck.cards[currentIndex].back}`}
+            </h5>
+          <button
+            type='button'
+            className='btn btn-secondary'
+            onClick={() => flipCardHandler()}
+          >
+            Flip
+          </button>
+          {isCardFlipped && (
+            <button
+              className='btn btn-primary ml-2'
+              onClick={getNextCardHandler}
+            >
+              Next
+            </button>
+          )}
         </div>
-        )
-    } else {
-        return(
-            <div>
-            <div>
-                {nav}
-            </div>
-            <h1>{studyDeck.name}: Study</h1>
-            <div className="card">
-                <div className="card-body">
-                    <h4 className="card-title">Card {studyDeck.currentIndex + 1} of {deck.cards.length}</h4>
-                    <p className="card-text">
-                        {studyDeck.flipped ? `${studyDeck.cards[currentIndex].front}` : `${deck.cards[currentIndex].back}`}
-                    </p>
-           </div>
-           <button className="btn btn-secondary" onClick={handleFlip}>Flip</button>
-           <button className="btn btn-primary" onClick={handleNext}>Next</button>
-           </div>
-         </div>
-        )
-    }
+        </div>
+      </>
+    );
+  }
 }
 
-
-export default Study
+export default Study;

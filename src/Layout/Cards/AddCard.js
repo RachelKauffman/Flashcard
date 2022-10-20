@@ -6,7 +6,7 @@ import {readDeck, createCard} from "../../utils/api";
 function AddCard() {
     const initialForm = {
         "front": "",
-        "back" : ""
+        "back" : "",
     }
 
     const [card, setCard] = useState(initialForm); //will change state of card
@@ -14,17 +14,15 @@ function AddCard() {
     const {deckId} = useParams;
     const [deck, setDeck] = useState([])
 
-    //effect to load deck
     useEffect(() => {
-        const abortController = new AbortController()
+        const abortController = new AbortController();
         async function loadDeck() {
-            const response = await fetch(readDeck, abortController.signal)
-     
-            setDeck(response)
-        }
-        loadDeck();
-        return () => abortController.abort()
-    },[deckId]) //renders each time deckId changes 
+          const response = await readDeck(deckId, abortController.signal)
+           setDeck(response)
+         }  
+         loadDeck();
+         return () => abortController.abort()
+     },[deckId]) //renders each time deckId changes
 
     //handler for changes made to front and back of card
     const changeHandler = ({target}) => {
@@ -38,6 +36,7 @@ function AddCard() {
         event.preventDefault();
         await createCard(card)//gets data from api
         setCard(...initialForm) //clears data
+        history.push(`/decks/${deckId}/cards/new`)
      })
 
      return (
@@ -47,7 +46,7 @@ function AddCard() {
             <ol className='breadcrumb'>
                 <li className='breadcrumb-item'>
                     <Link to="/">
-                        Home
+                      <i className="fas fa-home"></i>  Home
                     </Link>
                 </li>
                 <li className='breadcrumb-item'>
@@ -61,25 +60,29 @@ function AddCard() {
             </ol>
         </nav> 
         <div>
-            <h1>`${deck.name}`: Add Card</h1>
+            <h1>{deck.name} Add Card</h1>
             <form onSubmit={submitHandler}>
               <div>
                 <label htmlFor="Front">Front</label>
                 <textarea type="textarea"
                           name="front"
                           id="front"
+                          className="form-control"
+                          rows="2"
                           onChange={changeHandler}
                           value={card.front}/>
                 <label htmlFor="back">Back</label>
                 <textarea type="textarea"
                           name="back"
                           id="back"
+                          className="form-control mb-2"
+                          rows="2"
                           onChange={changeHandler}
                           value={card.back}/>
               </div>
               <div>
-                <button type="submit" onClick={submitHandler}>Save</button>
-                <button type="submit" onClick={() => history.push(`{/decks/${deckId}}`)}>Done</button>
+                <button className="btn btn-secondary mr-2" onClick={() => history.push(`{/decks/${deckId}}`)}>Done</button>
+                <button className="btn btn-primary" onClick={submitHandler}>Save</button>
               </div>
             </form>
          </div>

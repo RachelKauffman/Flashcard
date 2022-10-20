@@ -84,30 +84,34 @@ function EditCard(){
             <h1>Edit Card</h1>
             <form onSubmit={submitHandler}>
                 <div>
-                    <label htmlFor="Front">
+                    <label htmlFor="Front">Front</label>
                         <textarea type="textarea"
                                   name="front"
                                   id="front"
+                                  className="form-control"
+                                  rows="2"
+                                  width="100%"
                                   placeholder="Front side of card"
                                   onChange={changeFront}
                                   value={card.front} />
-                    </label>
+                    
                 </div>
                 <div>
-                    <label htmlFor="Back">
+                    <label htmlFor="Back">Back</label>
                         <textarea type="textarea"
                                   name="back"
                                   id="back"
+                                  className="form-control"
+                                  rows="2"
                                   placeholder="Back side of card"
                                   onChange={changeBack}
                                   value={card.back} />
-                    </label>
                 </div>
                 <div>
                     <Link to={`/decks/${deckId}`}>
-                    <button class="btn btn-secondary" onClick={() => history.push(`/decks/${deckId}`)}>
+                    <button class="btn btn-secondary mt-2 mr-2" onClick={() => history.push(`/decks/${deckId}`)}>
                         Cancel</button>
-                    <button class="btn btn-primary" onClick={() => history.push(`/decks/${deckId}`)}>
+                    <button class="btn btn-primary mt-2" onClick={() => history.push(`/decks/${deckId}`)}>
                         Submit
                     </button>
                     </Link>

@@ -2,28 +2,11 @@
   "decks": [
     {
       "id": 1,
-      "name": "Rendering in React",
-      "description": "React's component structure allows for quickly building a complex web application that relies on DOM manipulation. "
+      "name": "Rendering in React"
     },
     {
       "name": "React Router",
-      "description": "React Router is a collection of navigational components that compose declaratively with your application.",
       "id": 2
-    },
-    {
-      "name": "test",
-      "description": "test",
-      "id": 3
-    },
-    {
-      "name": "test2",
-      "description": "test2",
-      "id": 4
-    },
-    {
-      "name": "test3",
-      "description": "Test3",
-      "id": 5
     },
     {
       "name": "test",
@@ -32,12 +15,6 @@
     }
   ],
   "cards": [
-    {
-      "id": 1,
-      "front": "Differentiate between Real DOM and Virtual DOM.",
-      "back": "Virtual DOM updates are faster but do not directly update the HTML",
-      "deckId": 1
-    },
     {
       "id": 2,
       "front": "How do you modify the state of a different React component?",
@@ -61,13 +38,6 @@
       "back": "Renders the first matching child <Route> ",
       "deckId": 2,
       "id": 5
-    },
-    {
-      "cards": [],
-      "front": "b",
-      "back": "b",
-      "deckId": 1,
-      "id": 7
     }
   ]
 }
