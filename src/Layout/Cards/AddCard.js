@@ -1,28 +1,47 @@
-import {React, useState, useEffect} from 'react';
+import {React, useState, useEffect, useRef} from 'react';
 import {Link, useHistory, useParams } from 'react-router-dom';
 import {readDeck, createCard} from "../../utils/api";
 
 
 function AddCard() {
     const initialForm = {
-        "front": "",
-        "back" : "",
+        id: "",
+        front: "",
+        back : "",
+        deckId: "",
     }
-
+    const mountedRef = useRef(false);
     const [card, setCard] = useState(initialForm); //will change state of card
     const history = useHistory();
     const {deckId} = useParams;
     const [deck, setDeck] = useState([])
-
+    
     useEffect(() => {
+        mountedRef.current = true;
+        return () => {
+          mountedRef.current = false;
+        };
+      }, []);
+
+      useEffect(() => {
         const abortController = new AbortController();
         async function loadDeck() {
-          const response = await readDeck(deckId, abortController.signal)
-           setDeck(response)
-         }  
-         loadDeck();
-         return () => abortController.abort()
-     },[deckId]) //renders each time deckId changes
+          try {
+            const loadedDeck = await readDeck(deckId, abortController.signal);
+            if (mountedRef.current) {
+              setDeck(() => loadedDeck);
+            }
+          } catch (error) {
+            if (error.name !== 'AbortError') {
+              throw error;
+            }
+          }
+        }
+        loadDeck();
+        return () => {
+          abortController.abort();
+        };
+      }, [deckId]);
 
     //handler for changes made to front and back of card
     const changeHandler = ({target}) => {
