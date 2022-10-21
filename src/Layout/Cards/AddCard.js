@@ -1,21 +1,25 @@
 import {React, useState, useEffect, useRef} from 'react';
 import {Link, useHistory, useParams } from 'react-router-dom';
 import {readDeck, createCard} from "../../utils/api";
+import CardForm from './CardForm';
 
 
 function AddCard() {
+
+    const mountedRef = useRef(false);
+    const history = useHistory();
+    const {deckId} = useParams();
+    const [deck, setDeck] = useState([])
+    
     const initialForm = {
         id: "",
         front: "",
         back : "",
         deckId: "",
     }
-    const mountedRef = useRef(false);
+
     const [card, setCard] = useState(initialForm); //will change state of card
-    const history = useHistory();
-    const {deckId} = useParams;
-    const [deck, setDeck] = useState([])
-    
+
     useEffect(() => {
         mountedRef.current = true;
         return () => {
@@ -43,18 +47,18 @@ function AddCard() {
         };
       }, [deckId]);
 
-    //handler for changes made to front and back of card
+    //handler for changes made to card
     const changeHandler = ({target}) => {
-        setCard((currentCard) => ({
-            ...currentCard,
+        setCard((currentState) => ({
+            ...currentState,
             [target.name]:target.value
         }))
     }
 
     const submitHandler = ( async (event) => {
         event.preventDefault();
-        await createCard(card)//gets data from api
-        setCard(...initialForm) //clears data
+        await createCard(deckId, card)//gets data from api
+        setCard(initialForm) //clears data
         history.push(`/decks/${deckId}/cards/new`)
      })
 
@@ -79,31 +83,12 @@ function AddCard() {
             </ol>
         </nav> 
         <div>
-            <h1>{deck.name} Add Card</h1>
-            <form onSubmit={submitHandler}>
-              <div>
-                <label htmlFor="Front">Front</label>
-                <textarea type="textarea"
-                          name="front"
-                          id="front"
-                          className="form-control"
-                          rows="2"
-                          onChange={changeHandler}
-                          value={card.front}/>
-                <label htmlFor="back">Back</label>
-                <textarea type="textarea"
-                          name="back"
-                          id="back"
-                          className="form-control mb-2"
-                          rows="2"
-                          onChange={changeHandler}
-                          value={card.back}/>
-              </div>
-              <div>
-                <button className="btn btn-secondary mr-2" onClick={() => history.push(`{/decks/${deckId}}`)}>Done</button>
-                <button className="btn btn-primary" onClick={submitHandler}>Save</button>
-              </div>
-            </form>
+            <h1> {deck.name}: Add Card</h1>
+            <CardForm changeHandler={changeHandler}
+                     submitHandler={submitHandler}
+                     card={card}
+                     deckId={deckId}
+/>
          </div>
         </div>
      )

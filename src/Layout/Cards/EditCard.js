@@ -1,7 +1,7 @@
-import {React, useState, useEffect} from "react";
+import {React, useState, useEffect, useRef} from "react";
 import {Link, useParams, useHistory} from "react-router-dom";
 import {readCard, readDeck, updateCard} from "../../utils/api";
-
+import CardForm from "./CardForm";
 
 function EditCard(){
     const {cardId, deckId} = useParams();
@@ -12,54 +12,76 @@ function EditCard(){
         back: "",
         deckId: ""
      }
-
+     const mountedRef = useRef(false)
      const [card, setCard] = useState(initialState)
      const [deck, setDeck] = useState({name: "", description: "", id: ""})
+
+     //track state
+     useEffect(() => {
+        mountedRef.current = true;
+        return () => {
+            mountedRef.current = false;
+        }
+     }, [])
 
      //get decks from api
      useEffect(() => {
         const abortController = new AbortController();
         async function loadDeck() {
-            const response = await readDeck (deckId,abortController.signal)
-             setDeck(response)
-           }  
-           loadDeck();
-           return () => abortController.abort()
-       },[deckId]) //renders each time deckId changes
+          try {
+            const loadedDeck = await readDeck(deckId, abortController.signal);
+            if (mountedRef.current) {
+              setDeck(() => loadedDeck);
+            }
+          } catch (error) {
+            if (error.name !== 'AbortError') {
+              throw error;
+            }
+          }
+        }
+        loadDeck();
+        return () => {
+          abortController.abort();
+        };
+      }, [deckId]);//renders each time card Id changes
+
      
 
      //get cards from api
      useEffect(() => {
         const abortController = new AbortController();
-        async function loadCards() {
-            const response = await readCard (cardId, abortController.signal)
-            setCard(response)
+        async function loadCard() {
+          try {
+            const loadedCard = await readCard(cardId, abortController.signal);
+            if (mountedRef.current) {
+              setCard(() => loadedCard);
+            }
+          } catch (error) {
+            if (error.name !== 'AbortError') {
+              throw error;
+            }
+          }
         }
-        loadCards();
-        return () => abortController.abort()
-     }, [cardId])//renders each time card Id changes
+        loadCard();
+        return () => {
+          abortController.abort();
+        };
+      }, [cardId]);//renders each time card Id changes
 
-     //handles front of card change
-     const changeFront = (event) => {
-        setCard({
-            ...card,
-            front: event.target.value
-        })
+     
+     const changeHandler = ({target}) => {
+        setCard((currentState) => ({
+            ...currentState,
+            [target.name] : target.value,
+        }))
      }
 
-     //handles back of card change
-     const changeBack = (event) => {
-        setCard({
-            ...card,
-            back: event.target.value
-        })
-     }
-
-     const submitHandler = ( async (event) => {
+     const submitHandler = async (event) => {
         event.preventDefault();
         await updateCard(card)
+        setCard(initialState)
         history.push(`/decks/${deckId}`)
-     })
+     }
 
      return(
         <div>
@@ -82,41 +104,11 @@ function EditCard(){
          </nav>
          <div>
             <h1>Edit Card</h1>
-            <form onSubmit={submitHandler}>
-                <div>
-                    <label htmlFor="Front">Front</label>
-                        <textarea type="textarea"
-                                  name="front"
-                                  id="front"
-                                  className="form-control"
-                                  rows="2"
-                                  width="100%"
-                                  placeholder="Front side of card"
-                                  onChange={changeFront}
-                                  value={card.front} />
-                    
-                </div>
-                <div>
-                    <label htmlFor="Back">Back</label>
-                        <textarea type="textarea"
-                                  name="back"
-                                  id="back"
-                                  className="form-control"
-                                  rows="2"
-                                  placeholder="Back side of card"
-                                  onChange={changeBack}
-                                  value={card.back} />
-                </div>
-                <div>
-                    <Link to={`/decks/${deckId}`}>
-                    <button class="btn btn-secondary mt-2 mr-2" onClick={() => history.push(`/decks/${deckId}`)}>
-                        Cancel</button>
-                    <button class="btn btn-primary mt-2" onClick={() => history.push(`/decks/${deckId}`)}>
-                        Submit
-                    </button>
-                    </Link>
-                </div>
-            </form>
+            <CardForm changeHandler={changeHandler}
+                      submitHandler={submitHandler}
+                      card={card}
+                      deckId={deckId}
+                />
          </div>
         </div>
      )
