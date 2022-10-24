@@ -1,41 +1,53 @@
-import { React, useEffect, useState } from "react";
-import { Link, useParams, useHistory } from "react-router-dom";
 import ListDecks from "./Decks/ListDecks";
-import { deleteDeck, listDecks } from "../utils/api";
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { deleteDeck, listDecks } from '../utils/api/index';
+
 
 function Home() {
-  const history = useHistory();
-  const [decks, setDecks] = useState([]);
-  const { deckId } = useParams();
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    async function loadDecks() {
-      try {
-        const response = await listDecks(abortController.signal);
-        setDecks(response);
-      } catch (error) {
-        console.log(`Test ${error}`);
+    const mountedRef = useRef(false);
+    const [decks, setDecks] = useState([]);
+    const history = useHistory();
+  
+    useEffect(() => {
+      mountedRef.current = true;
+      return () => {
+        mountedRef.current = false;
+      };
+    }, []);
+  
+    useEffect(() => {
+      const abortController = new AbortController();
+      async function loadDecks() {
+        try {
+          const decks = await listDecks();
+          if (mountedRef.current) {
+            setDecks((_) => [...decks]);
+          }
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            throw error;
+          }
+        }
       }
-    }
-    loadDecks();
-    return () => abortController.abort();
-  }, []);
-
-  console.log(decks)
-
-  const deleteHandler = async () => {
-    const prompt = window.confirm(
-      "Delete this deck? You will not be able to recover it."
-    );
-    if (prompt) {
-      history.push("/")
-      await deleteDeck(deckId);
-    }
-  };
+      loadDecks();
+  
+      return () => abortController.abort();
+    }, []);
+  
+    const deleteHandler = async (deckId) => {
+      const confirmation = window.confirm(
+        'Delete this deck? You will not be able to recover it.'
+      );
+      if (confirmation) {
+        await deleteDeck(deckId);
+        history.go(0);
+      }
+    };
+  
 
   return (
-    <div key={decks}>
+    <div>
       <div>
         <Link to="/decks/new">
           <button className="btn btn-secondary mb-2">
@@ -44,7 +56,7 @@ function Home() {
         </Link>
       </div>
       <div>
-      <ListDecks key={decks} decks={decks} deleteHandler={deleteHandler} /> 
+      <ListDecks decks={decks} deleteHandler={deleteHandler} /> 
     </div>
     </div>
   );
