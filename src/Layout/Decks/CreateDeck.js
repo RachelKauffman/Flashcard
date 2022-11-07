@@ -20,7 +20,7 @@ function CreateDeck() {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-     await createDeck(formData); //calls data from api
+    await createDeck(formData); //calls data from api
     setFormData({ ...initialForm }); //clears form
     history.push("/");
   };
@@ -43,12 +43,12 @@ function CreateDeck() {
           <h1 className="my-4">Create Deck</h1>
           <div className="form-group">
             <label htmlFor="name">Name</label>
-           
+
             <input
               type="text"
               name="name"
               id="name"
-              className='form-control form-control-md'
+              className="form-control form-control-md"
               placeholder="Deck Name"
               onChange={changeHandler}
               value={formData.name}
@@ -68,11 +68,14 @@ function CreateDeck() {
             />
           </div>
           <Link to="/" className="mr-2">
-            <button className="btn btn-secondary" onClick={() => history.push("/")}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => history.push("/")}
+            >
               Cancel
             </button>
-            </Link>
-            <button className="btn btn-primary">Submit</button>
+          </Link>
+          <button className="btn btn-primary">Submit</button>
         </form>
       </div>
     </div>
