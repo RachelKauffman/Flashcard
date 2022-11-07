@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useHistory } from 'react-router-dom';
 import { readDeck } from '../utils/api';
 
 function Study() {
@@ -12,7 +12,7 @@ function Study() {
 
   const [studyDeckState, setStudyDeckState] = useState(initialState);
   const { deck, isCardFlipped, currentIndex } = studyDeckState;
-
+  const history = useHistory();
   const { deckId } = useParams();
 
   useEffect(() => {
@@ -54,24 +54,21 @@ function Study() {
 
   function getNextCardHandler() {
     const { cards } = deck;
-    if (currentIndex === cards.length - 1) {
-      const response = window.confirm(
-        'Do you want to restart the deck and study again?'
-      );
-      if (response) {
-        setStudyDeckState((currentState) => ({
-          ...currentState,
-          currentIndex: 0,
-        }));
-      }
+    if (studyDeckState.currentIndex < cards.length - 1) {
+      setStudyDeckState({
+          ...studyDeckState,
+          currentIndex: studyDeckState.currentIndex + 1,
+          isCardFlipped: false,
+      })
     } else {
-      setStudyDeckState((currentState) => ({
-        ...currentState,
-        currentIndex: currentState.currentIndex++,
-        isCardFlipped: !currentState.isCardFlipped,
-      }));
+    const confirm = window.confirm("Restart cards? Click cancel to return to the home page.");
+    if(confirm) {
+        setStudyDeckState(initialState);
+    } else {
+        history.push("/");
     }
-  }
+}
+}
 
   const breadcrumb = (
     <nav aria-label='breadcrumb'>
@@ -148,5 +145,6 @@ function Study() {
     );
   }
 }
+
 
 export default Study;

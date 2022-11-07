@@ -6,9 +6,9 @@
       "name": "test-1"
     },
     {
-      "name": "test2",
-      "description": "test2",
-      "id": 2
+      "name": "delete-me",
+      "description": "delete",
+      "id": 3
     }
   ],
   "cards": [
@@ -16,6 +16,18 @@
       "id": 1,
       "front": "front - 1",
       "back": "back - 1",
+      "deckId": 1
+    },
+    {
+      "id": 2,
+      "front": "card 2",
+      "back": "card 2",
+      "deckId": 1
+    },
+    {
+      "id": 3,
+      "front": "card 3",
+      "back": "card 3",
       "deckId": 1
     }
   ]
