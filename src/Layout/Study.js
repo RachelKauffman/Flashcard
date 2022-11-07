@@ -63,7 +63,10 @@ function Study() {
     } else {
     const confirm = window.confirm("Restart cards? Click cancel to return to the home page.");
     if(confirm) {
-        setStudyDeckState(initialState);
+        setStudyDeckState((currentState) => ({
+          ...currentState,
+          currentIndex: 0
+        }));
     } else {
         history.push("/");
     }
